@@ -1,0 +1,13 @@
+---
+title: "Jin Kuang – Baruch College Graduate Student"
+
+---
+
+My name is Jin Kuang. But you can call me Benjamin. I studied my Bachelor's degree at the University of Waterloo in Canada. My majors are Statistics and Computational Mathematics. My graduate study just recently begins in New York at Baruch College, with the major being Quantitative Methods and Modeling. I hope during the graduate, I can experience great internships and possibly a good full-time job in the United States.
+
+```{r}
+#| include: false
+Sys.setlocale("LC_TIME", "C")
+```
+--------------
+Last Updated: `r format(Sys.time(), "%A %m %d, %Y at %I:%M %p")`
