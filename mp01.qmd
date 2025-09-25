@@ -44,7 +44,6 @@ COUNTRY_TOP_10 <- read_tsv(COUNTRY_TOP_10_FILENAME,
                           na = "N/A")
 ```
 
-
 ## Task 4
 ### Q1
 ```{r}
@@ -192,12 +191,6 @@ Thus, there are approximately `{r} views_n` views received in 2021
 
 ### Q9
 ```{r}
-
-```
-
-
-
-```{r}
 COUNTRY_TOP_10 |>
   filter(country_name == "United States", category == "Films") |>
   group_by(show_title) |>
@@ -253,48 +246,4 @@ COUNTRY_TOP_10 |>
 Thus, Emily in Paris: Season 2 hits the top 10 in the most countries in its debut week.
 It charted for 94 countries.  
 
-
 ## Task 5
-
-
-
-
-
-
-
-
-```{r}
-library(stringr)
-format_titles <- function(df){
-    colnames(df) <- str_replace_all(colnames(df), "_", " ") |> str_to_title()
-    df
-}
-
-GLOBAL_TOP_10 |> 
-    format_titles() |>
-    head(n=20) |>
-    datatable(options=list(searching=FALSE, info=FALSE)) |>
-    formatRound(c('Weekly Hours Viewed', 'Weekly Views'))
-```
-
-```{r}
-GLOBAL_TOP_10 |> 
-    select(-season_title) |>
-    format_titles() |>
-    head(n=20) |>
-    datatable(options=list(searching=FALSE, info=FALSE)) |>
-    formatRound(c('Weekly Hours Viewed', 'Weekly Views'))
-```
-
-```{r}
-GLOBAL_TOP_10 |> 
-    mutate(`runtime_(minutes)` = round(60 * runtime)) |>
-    select(-season_title, 
-           -runtime) |>
-    format_titles() |>
-    head(n=20) |>
-    datatable(options=list(searching=FALSE, info=FALSE)) |>
-    formatRound(c('Weekly Hours Viewed', 'Weekly Views'))
-```
-
-1
