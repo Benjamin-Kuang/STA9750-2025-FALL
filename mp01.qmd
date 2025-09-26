@@ -1,6 +1,10 @@
 ---
 title: "Mini Project 1"
 author: "Jin Kuang"
+format:
+  html:
+    code-fold: true
+    code-summary: "Show the code"
 ---
 
 ## Task 1

@@ -182,6 +182,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="task-1" class="level2">
 <h2 class="anchored" data-anchor-id="task-1">Task 1</h2>
 <div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span>(<span class="sc">!</span><span class="fu">dir.exists</span>(<span class="fu">file.path</span>(<span class="st">"data"</span>, <span class="st">"mp01"</span>))){</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">dir.create</span>(<span class="fu">file.path</span>(<span class="st">"data"</span>, <span class="st">"mp01"</span>), <span class="at">showWarnings=</span><span class="cn">FALSE</span>, <span class="at">recursive=</span><span class="cn">TRUE</span>)</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>}</span>
@@ -199,9 +201,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">download.file</span>(<span class="st">"https://www.netflix.com/tudum/top10/data/all-weeks-countries.tsv"</span>, </span>
 <span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>                  <span class="at">destfile=</span>COUNTRY_TOP_10_FILENAME)</span>
 <span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 </div>
 <div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span>(<span class="sc">!</span><span class="fu">require</span>(<span class="st">"tidyverse"</span>)) <span class="fu">install.packages</span>(<span class="st">"tidyverse"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 <div class="cell-output cell-output-stderr">
 <pre><code>Loading required package: tidyverse</code></pre>
 </div>
@@ -217,10 +223,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 ✖ dplyr::lag()    masks stats::lag()
 ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors</code></pre>
 </div>
+<details class="code-fold">
+<summary>Show the code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(readr)</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>GLOBAL_TOP_10 <span class="ot">&lt;-</span> <span class="fu">read_tsv</span>(GLOBAL_TOP_10_FILENAME)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 <div class="cell-output cell-output-stderr">
 <pre><code>Rows: 8720 Columns: 9
 ── Column specification ────────────────────────────────────────────────────────
@@ -237,15 +246,21 @@ date (1): week
 <section id="task-2" class="level2">
 <h2 class="anchored" data-anchor-id="task-2">Task 2</h2>
 <div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>GLOBAL_TOP_10 <span class="ot">&lt;-</span> GLOBAL_TOP_10 <span class="sc">|&gt;</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">season_title =</span> <span class="fu">if_else</span>(season_title <span class="sc">==</span> <span class="st">"N/A"</span>, <span class="cn">NA_character_</span>, season_title))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 </div>
 </section>
 <section id="task-3" class="level2">
 <h2 class="anchored" data-anchor-id="task-3">Task 3</h2>
 <div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>COUNTRY_TOP_10 <span class="ot">&lt;-</span> <span class="fu">read_tsv</span>(COUNTRY_TOP_10_FILENAME,</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>                          <span class="at">na =</span> <span class="st">"N/A"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 <div class="cell-output cell-output-stderr">
 <pre><code>Rows: 406180 Columns: 8
 ── Column specification ────────────────────────────────────────────────────────
@@ -264,6 +279,8 @@ date (1): week
 <section id="q1" class="level3">
 <h3 class="anchored" data-anchor-id="q1">Q1</h3>
 <div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>country_n <span class="ot">&lt;-</span> COUNTRY_TOP_10 <span class="sc">|&gt;</span></span>
@@ -271,6 +288,7 @@ date (1): week
 <span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>()</span>
 <span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>country_n</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 1 × 1
       n
@@ -283,6 +301,8 @@ date (1): week
 <section id="q2" class="level3">
 <h3 class="anchored" data-anchor-id="q2">Q2</h3>
 <div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(DT)</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(stringr)</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -294,6 +314,7 @@ date (1): week
 <span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="st">`</span><span class="at">Show Title</span><span class="st">`</span> <span class="ot">=</span> show_title) <span class="sc">|&gt;</span></span>
 <span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>(<span class="dv">20</span>) <span class="sc">|&gt;</span></span>
 <span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">datatable</span>(<span class="at">options =</span> <span class="fu">list</span>(<span class="at">searching =</span> <span class="cn">FALSE</span>, <span class="at">info =</span> <span class="cn">FALSE</span>)) </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 <div class="cell-output cell-output-stderr">
 <pre><code>Warning: Returning more (or less) than 1 row per `summarise()` group was deprecated in
 dplyr 1.1.0.
@@ -306,8 +327,8 @@ dplyr 1.1.0.
 `.groups` argument.</code></pre>
 </div>
 <div class="cell-output-display">
-<div class="datatables html-widget html-fill-item" id="htmlwidget-e5984bbc00545278408a" style="width:100%;height:auto;"></div>
-<script type="application/json" data-for="htmlwidget-e5984bbc00545278408a">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20"],["All Quiet on the Western Front","All Quiet on the Western Front","All Quiet on the Western Front","Under Paris","All Quiet on the Western Front","Under Paris","All Quiet on the Western Front","Under Paris","All Quiet on the Western Front","RRR (Hindi)","Through My Window","Under Paris","All Quiet on the Western Front","RRR (Hindi)","Through My Window","Under Paris","All Quiet on the Western Front","Blood Red Sky","RRR (Hindi)","Through My Window"],[23,22,21,21,20,20,19,19,18,18,18,18,17,17,17,17,16,16,16,16]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>Show Title<\/th>\n      <th>Cumulative Weeks<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"searching":false,"info":false,"columnDefs":[{"className":"dt-right","targets":2},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"Show Title","targets":1},{"name":"Cumulative Weeks","targets":2}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<div class="datatables html-widget html-fill-item" id="htmlwidget-76d4963010c1a38a2309" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-76d4963010c1a38a2309">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20"],["All Quiet on the Western Front","All Quiet on the Western Front","All Quiet on the Western Front","Under Paris","All Quiet on the Western Front","Under Paris","All Quiet on the Western Front","Under Paris","All Quiet on the Western Front","RRR (Hindi)","Through My Window","Under Paris","All Quiet on the Western Front","RRR (Hindi)","Through My Window","Under Paris","All Quiet on the Western Front","Blood Red Sky","RRR (Hindi)","Through My Window"],[23,22,21,21,20,20,19,19,18,18,18,18,17,17,17,17,16,16,16,16]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>Show Title<\/th>\n      <th>Cumulative Weeks<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"searching":false,"info":false,"columnDefs":[{"className":"dt-right","targets":2},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"Show Title","targets":1},{"name":"Cumulative Weeks","targets":2}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
 </div>
 </div>
 <p>Therefore, “All Quiet on the Western Front” has spent the most cumulative weeks in the global top 10, and for 23 weeks.</p>
@@ -315,6 +336,8 @@ dplyr 1.1.0.
 <section id="q3" class="level3">
 <h3 class="anchored" data-anchor-id="q3">Q3</h3>
 <div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>GLOBAL_TOP_10 <span class="sc">|&gt;</span></span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(category <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"Films (English)"</span>, <span class="st">"Films (Non-English)"</span>)) <span class="sc">|&gt;</span>                 </span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(show_title) <span class="sc">|&gt;</span></span>
@@ -323,6 +346,7 @@ dplyr 1.1.0.
 <span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="st">`</span><span class="at">Show Title</span><span class="st">`</span> <span class="ot">=</span> show_title) <span class="sc">|&gt;</span></span>
 <span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>(<span class="dv">20</span>) <span class="sc">|&gt;</span></span>
 <span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">datatable</span>(<span class="at">options =</span> <span class="fu">list</span>(<span class="at">searching =</span> <span class="cn">FALSE</span>, <span class="at">info =</span> <span class="cn">FALSE</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 <div class="cell-output cell-output-stderr">
 <pre><code>Warning: Returning more (or less) than 1 row per `summarise()` group was deprecated in
 dplyr 1.1.0.
@@ -335,8 +359,8 @@ dplyr 1.1.0.
 `.groups` argument.</code></pre>
 </div>
 <div class="cell-output-display">
-<div class="datatables html-widget html-fill-item" id="htmlwidget-19d478c60bf4ad2ab50a" style="width:100%;height:auto;"></div>
-<script type="application/json" data-for="htmlwidget-19d478c60bf4ad2ab50a">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20"],["Pushpa 2: The Rule (Reloaded Version)","Pushpa 2: The Rule (Reloaded Version)","Animal","Animal","Animal","Titanic","Titanic","GOAT - The Greatest of All Time","GOAT - The Greatest of All Time","Horizon: An American Saga: Chapter 1","The Wolf of Wall Street","Adipurush","Adipurush","Adipurush","Kalki 2898 AD (Hindi)","Kalki 2898 AD (Hindi)","Kalki 2898 AD (Hindi)","Salaar","Salaar","Devara"],[224,224,201,201,201,195,195,181,181,181,180,178,178,178,176,176,176,174,174,172]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>Show Title<\/th>\n      <th>Runtime (Minutes)<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"searching":false,"info":false,"columnDefs":[{"className":"dt-right","targets":2},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"Show Title","targets":1},{"name":"Runtime (Minutes)","targets":2}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<div class="datatables html-widget html-fill-item" id="htmlwidget-d96319f15e92426bec6e" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-d96319f15e92426bec6e">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20"],["Pushpa 2: The Rule (Reloaded Version)","Pushpa 2: The Rule (Reloaded Version)","Animal","Animal","Animal","Titanic","Titanic","GOAT - The Greatest of All Time","GOAT - The Greatest of All Time","Horizon: An American Saga: Chapter 1","The Wolf of Wall Street","Adipurush","Adipurush","Adipurush","Kalki 2898 AD (Hindi)","Kalki 2898 AD (Hindi)","Kalki 2898 AD (Hindi)","Salaar","Salaar","Devara"],[224,224,201,201,201,195,195,181,181,181,180,178,178,178,176,176,176,174,174,172]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>Show Title<\/th>\n      <th>Runtime (Minutes)<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"searching":false,"info":false,"columnDefs":[{"className":"dt-right","targets":2},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"Show Title","targets":1},{"name":"Runtime (Minutes)","targets":2}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
 </div>
 </div>
 <p>Therefore, the longest film (English or non-English) to have ever appeared in the Netflix global Top 10 is “Pushpa 2: The Rule (Reloaded Version)”, which lasts for 224 minutes.</p>
@@ -344,6 +368,8 @@ dplyr 1.1.0.
 <section id="q4" class="level3">
 <h3 class="anchored" data-anchor-id="q4">Q4</h3>
 <div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>GLOBAL_TOP_10 <span class="sc">|&gt;</span></span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(category, show_title) <span class="sc">|&gt;</span></span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="st">`</span><span class="at">Total Hours of Global Viewership</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">sum</span>(weekly_hours_viewed)) <span class="sc">|&gt;</span></span>
@@ -352,13 +378,14 @@ dplyr 1.1.0.
 <span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="st">`</span><span class="at">Show Title</span><span class="st">`</span> <span class="ot">=</span> show_title,</span>
 <span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>         <span class="at">Category =</span> category) <span class="sc">|&gt;</span></span>
 <span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">datatable</span>(<span class="at">options =</span> <span class="fu">list</span>(<span class="at">searching =</span> <span class="cn">FALSE</span>, <span class="at">info =</span> <span class="cn">FALSE</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 <div class="cell-output cell-output-stderr">
 <pre><code>`summarise()` has grouped output by 'category'. You can override using the
 `.groups` argument.</code></pre>
 </div>
 <div class="cell-output-display">
-<div class="datatables html-widget html-fill-item" id="htmlwidget-1abd2bc34018fd8a0414" style="width:100%;height:auto;"></div>
-<script type="application/json" data-for="htmlwidget-1abd2bc34018fd8a0414">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4"],["TV (Non-English)","TV (English)","Films (English)","Films (Non-English)"],["Squid Game","Stranger Things","Red Notice","Society of the Snow"],[5048300000,2967980000,453990000,235900000]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>Category<\/th>\n      <th>Show Title<\/th>\n      <th>Total Hours of Global Viewership<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"searching":false,"info":false,"columnDefs":[{"className":"dt-right","targets":3},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"Category","targets":1},{"name":"Show Title","targets":2},{"name":"Total Hours of Global Viewership","targets":3}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<div class="datatables html-widget html-fill-item" id="htmlwidget-851c9a911ff828fc4ef4" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-851c9a911ff828fc4ef4">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4"],["TV (Non-English)","TV (English)","Films (English)","Films (Non-English)"],["Squid Game","Stranger Things","Red Notice","Society of the Snow"],[5048300000,2967980000,453990000,235900000]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>Category<\/th>\n      <th>Show Title<\/th>\n      <th>Total Hours of Global Viewership<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"searching":false,"info":false,"columnDefs":[{"className":"dt-right","targets":3},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"Category","targets":1},{"name":"Show Title","targets":2},{"name":"Total Hours of Global Viewership","targets":3}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
 </div>
 </div>
 <p>Thus, Squid Game has the most total hours of global viewership for non-English TV; Stranger Things has the most total hours of global viewership for English TV; Red Notice has the most total hours of global viewership for English films; Society of the Snow has the most total hours of global viewership for non-English films.</p>
@@ -366,6 +393,8 @@ dplyr 1.1.0.
 <section id="q5" class="level3">
 <h3 class="anchored" data-anchor-id="q5">Q5</h3>
 <div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>COUNTRY_TOP_10 <span class="sc">|&gt;</span></span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(category <span class="sc">==</span> <span class="st">"TV"</span>) <span class="sc">|&gt;</span>    </span>
 <span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(show_title, country_name) <span class="sc">|&gt;</span> </span>
@@ -375,6 +404,7 @@ dplyr 1.1.0.
 <span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>         <span class="st">`</span><span class="at">Country Name</span><span class="st">`</span> <span class="ot">=</span> country_name) <span class="sc">|&gt;</span></span>
 <span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>(<span class="dv">20</span>) <span class="sc">|&gt;</span></span>
 <span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">datatable</span>(<span class="at">options =</span> <span class="fu">list</span>(<span class="at">searching =</span> <span class="cn">FALSE</span>, <span class="at">info =</span> <span class="cn">FALSE</span>)) </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 <div class="cell-output cell-output-stderr">
 <pre><code>Warning: Returning more (or less) than 1 row per `summarise()` group was deprecated in
 dplyr 1.1.0.
@@ -387,8 +417,8 @@ dplyr 1.1.0.
 override using the `.groups` argument.</code></pre>
 </div>
 <div class="cell-output-display">
-<div class="datatables html-widget html-fill-item" id="htmlwidget-325c0da5bb655cb09b61" style="width:100%;height:auto;"></div>
-<script type="application/json" data-for="htmlwidget-325c0da5bb655cb09b61">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20"],["Money Heist","Money Heist","Money Heist","Money Heist","Money Heist","Money Heist","Money Heist","Money Heist","Money Heist","Money Heist","Money Heist","Money Heist","Money Heist","Money Heist","Money Heist","Lottie Dottie Chicken","Money Heist","Lottie Dottie Chicken","Money Heist","Lottie Dottie Chicken"],["Pakistan","Pakistan","Pakistan","Pakistan","Pakistan","Pakistan","Pakistan","Pakistan","Pakistan","Pakistan","Pakistan","Pakistan","Pakistan","Pakistan","Pakistan","Brazil","Pakistan","Brazil","Pakistan","Brazil"],[127,126,125,124,123,122,121,120,119,118,117,116,115,114,113,112,112,111,111,110]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>Show Title<\/th>\n      <th>Country Name<\/th>\n      <th>Run Time<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"searching":false,"info":false,"columnDefs":[{"className":"dt-right","targets":3},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"Show Title","targets":1},{"name":"Country Name","targets":2},{"name":"Run Time","targets":3}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<div class="datatables html-widget html-fill-item" id="htmlwidget-294bd1ef5d8dff170595" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-294bd1ef5d8dff170595">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20"],["Money Heist","Money Heist","Money Heist","Money Heist","Money Heist","Money Heist","Money Heist","Money Heist","Money Heist","Money Heist","Money Heist","Money Heist","Money Heist","Money Heist","Money Heist","Lottie Dottie Chicken","Money Heist","Lottie Dottie Chicken","Money Heist","Lottie Dottie Chicken"],["Pakistan","Pakistan","Pakistan","Pakistan","Pakistan","Pakistan","Pakistan","Pakistan","Pakistan","Pakistan","Pakistan","Pakistan","Pakistan","Pakistan","Pakistan","Brazil","Pakistan","Brazil","Pakistan","Brazil"],[127,126,125,124,123,122,121,120,119,118,117,116,115,114,113,112,112,111,111,110]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>Show Title<\/th>\n      <th>Country Name<\/th>\n      <th>Run Time<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"searching":false,"info":false,"columnDefs":[{"className":"dt-right","targets":3},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"Show Title","targets":1},{"name":"Country Name","targets":2},{"name":"Run Time","targets":3}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
 </div>
 </div>
 <p>Thus, Money Heist had the longest run in a country’s Top 10. It occurred in Pakistan and it lasted for 127 weeks.</p>
@@ -396,19 +426,24 @@ override using the `.groups` argument.</code></pre>
 <section id="q6" class="level3">
 <h3 class="anchored" data-anchor-id="q6">Q6</h3>
 <div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>COUNTRY_TOP_10 <span class="sc">|&gt;</span></span>
 <span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(country_name, week) <span class="sc">|&gt;</span>            </span>
 <span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(country_name) <span class="sc">|&gt;</span></span>
 <span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="st">`</span><span class="at">Number of Weeks</span><span class="st">`</span> <span class="ot">=</span> n) <span class="sc">|&gt;</span></span>
 <span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="st">`</span><span class="at">Number of Weeks</span><span class="st">`</span> <span class="sc">&lt;</span> <span class="dv">200</span>) <span class="sc">|&gt;</span>             </span>
 <span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">datatable</span>(<span class="at">options =</span> <span class="fu">list</span>(<span class="at">searching =</span> <span class="cn">FALSE</span>, <span class="at">info =</span> <span class="cn">FALSE</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 <div class="cell-output-display">
-<div class="datatables html-widget html-fill-item" id="htmlwidget-93b9f74cdc6ec07ceb62" style="width:100%;height:auto;"></div>
-<script type="application/json" data-for="htmlwidget-93b9f74cdc6ec07ceb62">{"x":{"filter":"none","vertical":false,"data":[["1"],["Russia"],[35]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>country_name<\/th>\n      <th>Number of Weeks<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"searching":false,"info":false,"columnDefs":[{"className":"dt-right","targets":2},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"country_name","targets":1},{"name":"Number of Weeks","targets":2}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<div class="datatables html-widget html-fill-item" id="htmlwidget-37ec6edc35c5c37110b7" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-37ec6edc35c5c37110b7">{"x":{"filter":"none","vertical":false,"data":[["1"],["Russia"],[35]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>country_name<\/th>\n      <th>Number of Weeks<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"searching":false,"info":false,"columnDefs":[{"className":"dt-right","targets":2},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"country_name","targets":1},{"name":"Number of Weeks","targets":2}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
 </div>
 </div>
 <p>Thus, this country that Netflix provides less than 200 weeks of service history is Russia.</p>
 <div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>COUNTRY_TOP_10 <span class="sc">|&gt;</span></span>
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(country_name <span class="sc">==</span> <span class="st">"Russia"</span>) <span class="sc">|&gt;</span></span>
 <span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(country_name) <span class="sc">|&gt;</span> </span>
@@ -417,6 +452,7 @@ override using the `.groups` argument.</code></pre>
 <span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="st">`</span><span class="at">Country Name</span><span class="st">`</span> <span class="ot">=</span> country_name) <span class="sc">|&gt;</span></span>
 <span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>(<span class="dv">20</span>) <span class="sc">|&gt;</span></span>
 <span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">datatable</span>(<span class="at">options =</span> <span class="fu">list</span>(<span class="at">searching =</span> <span class="cn">FALSE</span>, <span class="at">info =</span> <span class="cn">FALSE</span>)) </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 <div class="cell-output cell-output-stderr">
 <pre><code>Warning: Returning more (or less) than 1 row per `summarise()` group was deprecated in
 dplyr 1.1.0.
@@ -429,8 +465,8 @@ dplyr 1.1.0.
 `.groups` argument.</code></pre>
 </div>
 <div class="cell-output-display">
-<div class="datatables html-widget html-fill-item" id="htmlwidget-af175d1b8f375eef506d" style="width:100%;height:auto;"></div>
-<script type="application/json" data-for="htmlwidget-af175d1b8f375eef506d">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20"],["Russia","Russia","Russia","Russia","Russia","Russia","Russia","Russia","Russia","Russia","Russia","Russia","Russia","Russia","Russia","Russia","Russia","Russia","Russia","Russia"],["2022-02-27","2022-02-27","2022-02-27","2022-02-27","2022-02-27","2022-02-27","2022-02-27","2022-02-27","2022-02-27","2022-02-27","2022-02-27","2022-02-27","2022-02-27","2022-02-27","2022-02-27","2022-02-27","2022-02-27","2022-02-27","2022-02-27","2022-02-27"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>Country Name<\/th>\n      <th>Week Date<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"searching":false,"info":false,"columnDefs":[{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"Country Name","targets":1},{"name":"Week Date","targets":2}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<div class="datatables html-widget html-fill-item" id="htmlwidget-a36576b649188dfb5833" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-a36576b649188dfb5833">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20"],["Russia","Russia","Russia","Russia","Russia","Russia","Russia","Russia","Russia","Russia","Russia","Russia","Russia","Russia","Russia","Russia","Russia","Russia","Russia","Russia"],["2022-02-27","2022-02-27","2022-02-27","2022-02-27","2022-02-27","2022-02-27","2022-02-27","2022-02-27","2022-02-27","2022-02-27","2022-02-27","2022-02-27","2022-02-27","2022-02-27","2022-02-27","2022-02-27","2022-02-27","2022-02-27","2022-02-27","2022-02-27"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>Country Name<\/th>\n      <th>Week Date<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"searching":false,"info":false,"columnDefs":[{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"Country Name","targets":1},{"name":"Week Date","targets":2}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
 </div>
 </div>
 <p>Thus, Netflix cease operations in that country on 2022-02-27.</p>
@@ -438,11 +474,14 @@ dplyr 1.1.0.
 <section id="q7" class="level3">
 <h3 class="anchored" data-anchor-id="q7">Q7</h3>
 <div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>total_viewership <span class="ot">&lt;-</span> GLOBAL_TOP_10 <span class="sc">|&gt;</span></span>
 <span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(show_title <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"Squid Game"</span>, <span class="st">"Squid Game: The Challenge"</span>)) <span class="sc">|&gt;</span></span>
 <span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="st">`</span><span class="at">Total Viewership</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">sum</span>(weekly_hours_viewed))</span>
 <span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>total_viewership</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 1 × 1
   `Total Viewership`
@@ -455,6 +494,8 @@ dplyr 1.1.0.
 <section id="q8" class="level3">
 <h3 class="anchored" data-anchor-id="q8">Q8</h3>
 <div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lubridate)</span>
 <span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>GLOBAL_TOP_10 <span class="sc">|&gt;</span></span>
@@ -464,18 +505,22 @@ dplyr 1.1.0.
 <span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>         <span class="st">`</span><span class="at">Show Title</span><span class="st">`</span> <span class="ot">=</span> show_title,</span>
 <span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>         <span class="st">`</span><span class="at">Weekly Views</span><span class="st">`</span> <span class="ot">=</span> weekly_views) <span class="sc">|&gt;</span></span>
 <span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">datatable</span>(<span class="at">options =</span> <span class="fu">list</span>(<span class="at">searching =</span> <span class="cn">FALSE</span>, <span class="at">info =</span> <span class="cn">FALSE</span>)) </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 <div class="cell-output-display">
-<div class="datatables html-widget html-fill-item" id="htmlwidget-5e3add9759343446be24" style="width:100%;height:auto;"></div>
-<script type="application/json" data-for="htmlwidget-5e3add9759343446be24">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6","7"],["2021-12-26","2021-12-19","2021-12-12","2021-12-05","2021-11-28","2021-11-21","2021-11-14"],["Red Notice","Red Notice","Red Notice","Red Notice","Red Notice","Red Notice","Red Notice"],[null,null,null,null,null,null,null]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>Week<\/th>\n      <th>Show Title<\/th>\n      <th>Weekly Views<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"searching":false,"info":false,"columnDefs":[{"className":"dt-right","targets":3},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"Week","targets":1},{"name":"Show Title","targets":2},{"name":"Weekly Views","targets":3}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<div class="datatables html-widget html-fill-item" id="htmlwidget-55ec24ee5ec8c71e3868" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-55ec24ee5ec8c71e3868">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6","7"],["2021-12-26","2021-12-19","2021-12-12","2021-12-05","2021-11-28","2021-11-21","2021-11-14"],["Red Notice","Red Notice","Red Notice","Red Notice","Red Notice","Red Notice","Red Notice"],[null,null,null,null,null,null,null]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>Week<\/th>\n      <th>Show Title<\/th>\n      <th>Weekly Views<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"searching":false,"info":false,"columnDefs":[{"className":"dt-right","targets":3},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"Week","targets":1},{"name":"Show Title","targets":2},{"name":"Weekly Views","targets":3}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
 </div>
 </div>
 <p>Since from the above table, we find that the weekly views column are null, so we instead use the weekly hours viewed as our final answer.</p>
 <div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>views_n <span class="ot">&lt;-</span> GLOBAL_TOP_10 <span class="sc">|&gt;</span></span>
 <span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(show_title <span class="sc">==</span> <span class="st">"Red Notice"</span>, <span class="fu">year</span>(week) <span class="sc">==</span> <span class="dv">2021</span>) <span class="sc">|&gt;</span></span>
 <span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="st">`</span><span class="at">Number of Views</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">round</span>(<span class="fu">sum</span>(weekly_hours_viewed)) <span class="sc">/</span> ((<span class="dv">60</span> <span class="sc">+</span> <span class="dv">58</span>) <span class="sc">/</span> <span class="dv">60</span>))</span>
 <span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>views_n</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 1 × 1
   `Number of Views`
@@ -488,6 +533,8 @@ dplyr 1.1.0.
 <section id="q9" class="level3">
 <h3 class="anchored" data-anchor-id="q9">Q9</h3>
 <div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>COUNTRY_TOP_10 <span class="sc">|&gt;</span></span>
 <span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(country_name <span class="sc">==</span> <span class="st">"United States"</span>, category <span class="sc">==</span> <span class="st">"Films"</span>) <span class="sc">|&gt;</span></span>
 <span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(show_title) <span class="sc">|&gt;</span></span>
@@ -502,6 +549,7 @@ dplyr 1.1.0.
 <span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(<span class="st">`</span><span class="at">Week That Hit Number 1</span><span class="st">`</span>)) <span class="sc">|&gt;</span></span>
 <span id="cb32-13"><a href="#cb32-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="st">`</span><span class="at">Show Title</span><span class="st">`</span> <span class="ot">=</span> show_title) <span class="sc">|&gt;</span></span>
 <span id="cb32-14"><a href="#cb32-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">datatable</span>(<span class="at">options =</span> <span class="fu">list</span>(<span class="at">searching =</span> <span class="cn">FALSE</span>, <span class="at">info =</span> <span class="cn">FALSE</span>)) </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 <div class="cell-output cell-output-stderr">
 <pre><code>Warning: Returning more (or less) than 1 row per `summarise()` group was deprecated in
 dplyr 1.1.0.
@@ -514,12 +562,14 @@ dplyr 1.1.0.
 `.groups` argument.</code></pre>
 </div>
 <div class="cell-output-display">
-<div class="datatables html-widget html-fill-item" id="htmlwidget-c061f35cfdf503efc540" style="width:100%;height:auto;"></div>
-<script type="application/json" data-for="htmlwidget-c061f35cfdf503efc540">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29","30","31","32","33","34","35","36","37","38","39","40","41","42","43","44","45","46","47","48","49"],["KPop Demon Hunters","KPop Demon Hunters","KPop Demon Hunters","KPop Demon Hunters","Plane","The Wild Robot","Despicable Me 4","Aftermath","Despicable Me 2","Don't Move","The Garfield Movie","The Garfield Movie","Uglies","Jack Reacher: Never Go Back","Irish Wish","Lover, Stalker, Killer","The Postcard Killings","The Hill","No Hard Feelings","American Made","Love Again","Hidden Strike","They Cloned Tyrone","Puss in Boots: The Last Wish","The Boss Baby","The Boss Baby","Missing","Whitney Houston: I Wanna Dance with Somebody","Dog Gone","Prisoners","Bullet Train","Slumberland","Where the Crawdads Sing","Enola Holmes 2","Luckiest Girl Alive","Last Seen Alive","Lou","Father Stu","End of the Road","Day Shift","Uncharted","Purple Hearts","The Sea Beast","The Tinder Swindler","He's All That","The Vault","Blood Red Sky","Twilight","Mother's Day"],[6,6,6,6,2,3,2,4,2,3,4,4,2,2,2,2,7,9,3,9,3,2,3,3,6,6,5,2,4,4,2,3,4,2,2,4,2,6,2,2,2,2,5,3,2,9,5,3,5],[true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true],["2025-08-31","2025-08-24","2025-08-17","2025-08-10","2025-06-22","2025-06-01","2025-03-09","2025-02-16","2025-01-12","2024-11-03","2024-10-06","2024-09-29","2024-09-22","2024-08-11","2024-03-24","2024-02-18","2024-02-04","2024-01-28","2023-10-29","2023-10-15","2023-09-10","2023-08-06","2023-07-30","2023-07-23","2023-06-11","2023-06-04","2023-05-28","2023-04-30","2023-01-22","2022-12-18","2022-12-11","2022-11-27","2022-11-20","2022-11-13","2022-10-16","2022-10-09","2022-10-02","2022-09-25","2022-09-18","2022-08-21","2022-08-14","2022-08-07","2022-07-17","2022-02-13","2021-09-05","2021-08-08","2021-08-01","2021-07-25","2021-07-11"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>Show Title<\/th>\n      <th>First Rank<\/th>\n      <th>Eventually Hit Number 1?<\/th>\n      <th>Week That Hit Number 1<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"searching":false,"info":false,"columnDefs":[{"className":"dt-right","targets":2},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"Show Title","targets":1},{"name":"First Rank","targets":2},{"name":"Eventually Hit Number 1?","targets":3},{"name":"Week That Hit Number 1","targets":4}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<div class="datatables html-widget html-fill-item" id="htmlwidget-282c08ced714b7e7c8ca" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-282c08ced714b7e7c8ca">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29","30","31","32","33","34","35","36","37","38","39","40","41","42","43","44","45","46","47","48","49"],["KPop Demon Hunters","KPop Demon Hunters","KPop Demon Hunters","KPop Demon Hunters","Plane","The Wild Robot","Despicable Me 4","Aftermath","Despicable Me 2","Don't Move","The Garfield Movie","The Garfield Movie","Uglies","Jack Reacher: Never Go Back","Irish Wish","Lover, Stalker, Killer","The Postcard Killings","The Hill","No Hard Feelings","American Made","Love Again","Hidden Strike","They Cloned Tyrone","Puss in Boots: The Last Wish","The Boss Baby","The Boss Baby","Missing","Whitney Houston: I Wanna Dance with Somebody","Dog Gone","Prisoners","Bullet Train","Slumberland","Where the Crawdads Sing","Enola Holmes 2","Luckiest Girl Alive","Last Seen Alive","Lou","Father Stu","End of the Road","Day Shift","Uncharted","Purple Hearts","The Sea Beast","The Tinder Swindler","He's All That","The Vault","Blood Red Sky","Twilight","Mother's Day"],[6,6,6,6,2,3,2,4,2,3,4,4,2,2,2,2,7,9,3,9,3,2,3,3,6,6,5,2,4,4,2,3,4,2,2,4,2,6,2,2,2,2,5,3,2,9,5,3,5],[true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true],["2025-08-31","2025-08-24","2025-08-17","2025-08-10","2025-06-22","2025-06-01","2025-03-09","2025-02-16","2025-01-12","2024-11-03","2024-10-06","2024-09-29","2024-09-22","2024-08-11","2024-03-24","2024-02-18","2024-02-04","2024-01-28","2023-10-29","2023-10-15","2023-09-10","2023-08-06","2023-07-30","2023-07-23","2023-06-11","2023-06-04","2023-05-28","2023-04-30","2023-01-22","2022-12-18","2022-12-11","2022-11-27","2022-11-20","2022-11-13","2022-10-16","2022-10-09","2022-10-02","2022-09-25","2022-09-18","2022-08-21","2022-08-14","2022-08-07","2022-07-17","2022-02-13","2021-09-05","2021-08-08","2021-08-01","2021-07-25","2021-07-11"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>Show Title<\/th>\n      <th>First Rank<\/th>\n      <th>Eventually Hit Number 1?<\/th>\n      <th>Week That Hit Number 1<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"searching":false,"info":false,"columnDefs":[{"className":"dt-right","targets":2},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"Show Title","targets":1},{"name":"First Rank","targets":2},{"name":"Eventually Hit Number 1?","targets":3},{"name":"Week That Hit Number 1","targets":4}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
 </div>
 </div>
 <p>Films that first appeared on the Top 10 chart but then became more popular and eventually hit Number 1 are listed above. The most recent film to pull this off is “KPop Demon Hunters”.</p>
 <div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>films_n <span class="ot">&lt;-</span> COUNTRY_TOP_10 <span class="sc">|&gt;</span></span>
 <span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(country_name <span class="sc">==</span> <span class="st">"United States"</span>, category <span class="sc">==</span> <span class="st">"Films"</span>) <span class="sc">|&gt;</span></span>
 <span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(show_title) <span class="sc">|&gt;</span></span>
@@ -534,6 +584,7 @@ dplyr 1.1.0.
 <span id="cb35-12"><a href="#cb35-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(<span class="st">`</span><span class="at">Week That Hit Number 1</span><span class="st">`</span>)) <span class="sc">|&gt;</span></span>
 <span id="cb35-13"><a href="#cb35-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(show_title) <span class="sc">|&gt;</span></span>
 <span id="cb35-14"><a href="#cb35-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">nrow</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 <div class="cell-output cell-output-stderr">
 <pre><code>Warning: Returning more (or less) than 1 row per `summarise()` group was deprecated in
 dplyr 1.1.0.
@@ -545,7 +596,10 @@ dplyr 1.1.0.
 <pre><code>`summarise()` has grouped output by 'show_title'. You can override using the
 `.groups` argument.</code></pre>
 </div>
+<details class="code-fold">
+<summary>Show the code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>films_n</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 44</code></pre>
 </div>
@@ -555,6 +609,8 @@ dplyr 1.1.0.
 <section id="q10" class="level3">
 <h3 class="anchored" data-anchor-id="q10">Q10</h3>
 <div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>COUNTRY_TOP_10 <span class="sc">|&gt;</span></span>
 <span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(category <span class="sc">==</span> <span class="st">"TV"</span>) <span class="sc">|&gt;</span></span>
 <span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(show_title, season_title) <span class="sc">|&gt;</span></span>
@@ -562,6 +618,7 @@ dplyr 1.1.0.
 <span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(week <span class="sc">==</span> <span class="fu">first</span>(week)) <span class="sc">|&gt;</span></span>
 <span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="st">`</span><span class="at">Number of Country</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">length</span>(<span class="fu">unique</span>(country_name))) <span class="sc">|&gt;</span></span>
 <span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(<span class="st">`</span><span class="at">Number of Country</span><span class="st">`</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 <div class="cell-output cell-output-stderr">
 <pre><code>`summarise()` has grouped output by 'show_title'. You can override using the
 `.groups` argument.</code></pre>
