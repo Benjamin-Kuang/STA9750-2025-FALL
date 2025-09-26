@@ -191,7 +191,7 @@ views_n <- GLOBAL_TOP_10 |>
 views_n
 ```
 
-Thus, there are approximately `{r} views_n` views received in 2021
+Thus, there are approximately `{r} views_n` views received in 2021.
 
 ### Q9
 ```{r}
@@ -234,7 +234,7 @@ films_n <- COUNTRY_TOP_10 |>
 films_n
 ```
 
-Thus, there are a total of `{r} films_n` Films reached Number 1 in the US but did not originally debut there
+Thus, there are a total of `{r} films_n` Films reached Number 1 in the US but did not originally debut there.
 
 ### Q10
 ```{r}
@@ -244,7 +244,8 @@ COUNTRY_TOP_10 |>
   arrange(week) |>
   filter(week == first(week)) |>
   summarize(`Number of Country` = length(unique(country_name))) |>
-  arrange(desc(`Number of Country`))
+  arrange(desc(`Number of Country`)) |>
+  datatable(options = list(searching = FALSE, info = FALSE)) 
 ```
 
 Thus, Emily in Paris: Season 2 hits the top 10 in the most countries in its debut week.
