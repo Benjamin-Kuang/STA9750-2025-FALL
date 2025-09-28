@@ -3,6 +3,13 @@ title: "Mini Project 1"
 author: "Jin Kuang"
 ---
 
+## Introduction of Dataset
+We have two dataset, GLOBAL_TOP_10 and COUNTRY_TOP_10. GLOBAL_TOP_10 contains data about 
+the Netflix's shows globally, while COUNTRY_TOP_10 groups these shows by countries and shows
+less detail about shows themselves.
+
+We are now going to analyze some specific characteristics as indicated by the instructions posted by Professor Weylandt.
+
 ## Task 1
 ```{r}
 if(!dir.exists(file.path("data", "mp01"))){
