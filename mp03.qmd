@@ -1,0 +1,437 @@
+---
+title: "Mini Project 3"
+author: "Jin Kuang"
+date: "`r Sys.Date()`"
+format: 
+  html: 
+    toc: true
+    toc-depth: 3
+---
+
+## Introduction
+In NYC, abundant green spaces are cherished by residents and reflect a significant, ongoing investment by both the city government and a network of more than 550 nonprofit organizations and volunteer groups. In this project, I will download NYC Citcy Council District Boundaries data, NYC Tree Points data, NYC safety risk proposed by unhealthy trees data, and NYC ongoing maintenance orders data by directly calling API. I will analyze those downloaded data and make a report. Eventually, a government project design will be proposed at the end of this website to help improve the environmental condition (specifically trees) in district 32.
+
+## Task 1: Download NYC City Council District Boundaries
+```{r}
+suppressPackageStartupMessages({
+  library(sf)
+  library(fs)})
+
+NYC_City_Council <- function(url){
+  mp03 <- file.path("data", "mp03")
+  if (!dir.exists(mp03)) {
+    dir.create(mp03, showWarnings=FALSE, recursive=TRUE)
+  }
+  
+  zip_path <- file.path(mp03, "NYC City Council District Boundaries.zip")
+  if (!file.exists(zip_path)) {
+    download.file(url,
+                  destfile = zip_path,
+                  mode = "wb")
+  }
+  
+  shp_file <- dir_ls(mp03, recurse = TRUE, glob = "*.shp")
+  if (length(shp_file) == 0) {
+    unzip(zip_path, exdir = mp03)
+    shp_file <- dir_ls(mp03, recurse = TRUE, glob = "*.shp")
+  }
+  
+  NYC_file <- st_read(shp_file[1], quiet = TRUE)
+  NYC_file <- st_transform(NYC_file, crs = "WGS84")
+  
+  return(NYC_file)
+}
+
+council <- NYC_City_Council("https://s-media.nyc.gov/agencies/dcp/assets/files/zip/data-tools/bytes/city-council/nycc_25c.zip")
+```
+
+## Task 2: Download Tree Points
+```{r}
+suppressPackageStartupMessages({
+  library(httr2)
+  library(dplyr)})
+
+Tree_Points <- function(url) {
+  mp03 <- file.path("data", "mp03")
+  limit <- 1000
+  offset <- 0
+  page <- 1
+  all_files <- c()
+  temp <- TRUE
+  
+  while (temp) {
+    name <- file.path(mp03, paste0("treepoints", page, ".geojson"))
+
+    if (!file_exists(name)) {
+      request(url) |>
+        req_url_query(`$limit` = limit, `$offset` = offset) |>
+        req_perform() |>
+        resp_body_raw() |>
+        writeBin(con = name)
+    }
+
+    n_row <- if (!is.null(st_read(name, quiet = TRUE))) {
+                nrow(st_read(name, quiet = TRUE))}
+             else 0
+
+    if (n_row < limit) {
+      temp <- FALSE} 
+    else {
+      offset <- offset + limit
+      page <- page + 1}
+  }
+
+  geo_file <- dir_ls(mp03, glob = "*.geojson")
+  geo_data <- lapply(geo_file, st_read, quiet = TRUE) |>
+    lapply(mutate, planteddate = as.character(planteddate))
+  
+  result <- bind_rows(geo_data)
+
+  return(result)
+}
+
+tree <- Tree_Points("https://data.cityofnewyork.us/resource/hn5i-inap.geojson")
+```
+
+## Task 3: Plot All Tree Points
+Note that the following plot has been modified to be interactive (max 2 points) for Extra Credit Opportunity #01: Improved Tree Map Visualizations.
+```{r}
+#| code-fold: true
+
+library(ggplot2)
+library(plotly)
+
+plot <- ggplot() +
+  geom_sf(data = council, 
+          color = "black", 
+          size = 0.5) +
+  geom_hex(data = tree, 
+          aes(x = st_coordinates(geometry)[,1],
+               y = st_coordinates(geometry)[,2]),
+           bins = 100) +
+  scale_fill_viridis_c(name = "Density of Trees") +
+  xlab("Longitude") + 
+  ylab("Latitude") + 
+  labs(title = "NYC Trees in the City Council Districts") +
+  theme_bw()
+
+ggplotly(plot)
+```
+
+## Task 4: District-Level Analysis of Tree Coverage
+### 1. Which council district has the most trees?
+```{r}
+#| code-fold: true
+
+suppressPackageStartupMessages(library(DT))
+
+joined_data <- st_join(council, tree, join = st_contains)
+
+joined_data |>
+  st_drop_geometry() |>
+  count(CounDist) |>
+  arrange(desc(n)) |>
+  rename(`Council District` = CounDist,
+         `Number of Trees` = n) |>
+  datatable(options = list(searching = FALSE, info = FALSE)) 
+```
+Thus, the council district that has the most trees is district 51.
+
+### 2. Which council district has the highest density of trees?
+```{r}
+#| code-fold: true
+
+joined_data |>
+  st_drop_geometry() |>
+  group_by(CounDist) |>
+  summarize(`Number of Trees` = n(),   
+            `Area Size`  = mean(Shape_Area)) |>
+  mutate(Density = `Number of Trees` / `Area Size`) |>
+  arrange(desc(Density)) |>
+  rename(`Council District` = CounDist) |>
+  datatable(options = list(searching = FALSE, info = FALSE)) 
+```
+Thus, council district 7 has the highest density of trees.
+
+### 3. Which district has highest fraction of dead trees out of all trees?
+```{r}
+#| code-fold: true
+
+joined_data |>
+  st_drop_geometry() |>
+  group_by(CounDist) |>
+  summarize(`Number of Trees` = n(),
+            `Number of Dead Trees`  = sum(tpcondition == "Dead", na.rm = TRUE),
+            `Dead Trees Fraction` = `Number of Dead Trees` / `Number of Trees`) |>
+  arrange(desc(`Dead Trees Fraction`)) |>
+  rename(`Council District` = CounDist) |>
+  datatable(options = list(searching = FALSE, info = FALSE))
+```
+Thus, council district 32 has highest fraction of dead trees out of all trees.
+
+### 4. What is the most common tree species in Manhattan?
+```{r}
+#| code-fold: true
+
+joined_data <- joined_data |>
+  mutate(Borough = case_when(CounDist >= 1  & CounDist <= 10 ~ "Manhattan",
+                             CounDist >= 11 & CounDist <= 18 ~ "Bronx",
+                             CounDist >= 19 & CounDist <= 32 ~ "Queens",
+                             CounDist >= 33 & CounDist <= 48 ~ "Brooklyn",
+                             CounDist >= 49 & CounDist <= 51 ~ "Staten Island"))
+
+joined_data |>
+  st_drop_geometry() |>
+  filter(Borough == "Manhattan") |>
+  count(genusspecies) |>
+  arrange(desc(n)) |>
+  rename(`Tree Species` = genusspecies,
+         `Number of Trees` = n) |>
+  datatable(options = list(searching = FALSE, info = FALSE)) 
+```
+Thus, the most common tree species in Manhattan is "Gleditsia triacanthos var.inermis - Thornless honeylocust".
+
+### 5. What is the species of the tree closest to Baruch’s campus?
+```{r}
+#| code-fold: true
+
+new_st_point <- function(lat, lon){
+  st_sfc(st_point(c(lon, lat))) |>
+    st_set_crs("WGS84")
+}
+
+Baruch_location <- new_st_point(lat = 40.7403, lon = -73.9833)
+
+joined_data |>
+  filter(Borough == "Manhattan") |> 
+  select(geometry, genusspecies) |>
+  mutate(distance = st_distance(geometry, Baruch_location)) |>
+  arrange(distance) |>
+  slice(1) |>
+  pull(genusspecies)
+```
+Thus, the species of the tree closest to Baruch’s campus is "Gleditsia triacanthos var. inermis - Thornless honeylocust".
+
+## Task 5: NYC Parks Proposal
+Note that Extra Credit Opportunity #02: Additional Parks Data has been included.
+```{r}
+#| code-fold: true
+
+library(readr)
+
+Parks_data <- function(url, set_name) {
+  mp03 <- file.path("data", "mp03")
+  limit <- 1000
+  offset <- 0
+  page <- 1
+  result <- character(0)
+  temp <- TRUE
+
+  while (temp) {
+
+    name <- file.path(mp03, paste0(set_name, page, ".csv"))
+
+    if (!fs::file_exists(name)) {
+      request(url) |>
+        req_url_query(`$limit` = limit, `$offset` = offset) |>
+        req_perform() |>
+        resp_body_string() |>
+        writeLines(con = name)
+    }
+
+    n_rows <- nrow(read_csv(name, 
+                            show_col_types = FALSE,
+                            col_types = cols(.default = col_character())))
+
+    result <- c(result, name)
+
+    if (n_rows < limit) {
+      temp <- FALSE} 
+    else {
+      offset <- offset + limit
+      page   <- page + 1}
+  }
+
+  result |>
+    lapply(read_csv,
+           show_col_types = FALSE,
+           col_types = cols(.default = col_character())) |>
+    bind_rows()
+  
+  return(result)
+}
+
+risk <- Parks_data("https://data.cityofnewyork.us/resource/259a-b6s7.csv", "risk")|>
+  lapply(read_csv, show_col_types = FALSE, col_types = cols(.default = col_character())) |>
+  bind_rows()
+
+order <- Parks_data("https://data.cityofnewyork.us/resource/bdjm-n7q4.csv", "order") |>
+  lapply(read_csv, show_col_types = FALSE, col_types = cols(.default = col_character())) |>
+  bind_rows()
+```
+
+### Brief Project Description
+This project aims at removing dead trees in district 32 and replanting them. By doing so, the environmental diversity could be improved.
+
+### Quantitative Statement of the Desired Scope
+X: Number of Dead Trees
+Y: Number of Live Trees
+Z: Work Order Type and their Numbers (gathered from ongoing maintenance orders)
+W: 
+
+### Visualization of the Trees in District 32
+```{r}
+#| code-fold: true
+
+tree_data <- tree |> 
+  st_join(council)
+
+undead_trees <- tree_data |> 
+  filter(CounDist == 32) |>
+  filter(tpcondition != "Dead" & !is.na(tpcondition))
+
+dead_trees <- tree_data |> 
+  filter(CounDist == 32) |>
+  filter(tpcondition == "Dead")
+
+district_32 <- council |> 
+  filter(CounDist == 32)
+
+undead_trees$type <- "Live Trees"
+dead_trees$type <- "Dead Trees"
+all_trees <- rbind(undead_trees, dead_trees)
+
+ggplot() +
+  geom_sf(data = district_32,
+          color = "black",
+          size = 0.5) +
+  geom_sf(data = all_trees,
+          aes(color = type),
+          size = 0.5, 
+          alpha = 0.2) +
+  scale_color_manual(values = c("Live Trees" = "darkgreen", "Dead Trees" = "red"),
+                     name = "Tree Condition" ) +
+  xlab("Longitude") + 
+  ylab("Latitude") + 
+  labs(title = "District 32 Tree Plot") +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+From the above plot, we see that most areas were covered by red, which suggests the existence of lots of dead trees. This indicates that District 32 imperatively needs our project to help its environmental health.
+
+### A Quantitative Comparison
+```{r}
+#| code-fold: true
+
+tree_data |>
+  st_drop_geometry() |>
+  group_by(CounDist) |>
+  summarize(
+    `Total Number of Trees` = n(),
+    `Number of Dead Trees` = sum(tpcondition == "Dead", na.rm = TRUE),
+    `Proportion of Dead Trees` = `Number of Dead Trees` / `Total Number of Trees`) |>
+  arrange(desc(`Proportion of Dead Trees`)) |>
+  rename(`Council District` = CounDist) |>
+  datatable(options = list(searching = FALSE, info = FALSE)) 
+```
+From the above data table, we see that District 32 has the highest proportion of dead trees, which is roughly 0.1422.
+District 30 has proportion of dead trees 0.1403, which is lower than that of district 32.
+District 2 has proportion of dead trees 0.1362, which is lower than that of district 32.
+District 50 has proportion of dead trees 0.1343, which is lower than that of district 32.
+
+### Non-map Graphic
+```{r}
+#| code-fold: true
+
+df <- data.frame(district = c("District 32", "District 30", "District 2", "District 50"),
+                 ratio = c(0.1422, 0.1403, 0.1362, 0.1343))
+
+barplot(height = df$ratio,
+        names.arg = df$district,
+        col = "red",
+        main = "Barplot of the Proportion of Dead Trees in Four Districts",
+        xlab = "Council District",
+        ylab = "Proportion of Dead Trees",
+        ylim = c(0, 0.18))
+```
+From the simple barplot above, we know that district 32 has the highest proportion of dead trees among all four districts.
+
+### A visualization Showing A map-based Comparison Between District 32 and District 33
+```{r}
+#| code-fold: true
+
+undead_trees <- tree_data |> 
+  filter(CounDist %in% c(32, 46)) |>
+  filter(tpcondition != "Dead" & !is.na(tpcondition))
+
+dead_trees <- tree_data |> 
+  filter(CounDist %in% c(32, 46)) |>
+  filter(tpcondition == "Dead")
+
+district_32_46 <- council |> 
+  filter(CounDist %in% c(32, 46))
+
+undead_trees$type <- "Live Trees"
+dead_trees$type <- "Dead Trees"
+all_trees <- rbind(undead_trees, dead_trees)
+
+ggplot() +
+  geom_sf(data = district_32_46,
+          aes(group = CounDist),
+          color = "black",
+          size = 0.5) +
+  geom_sf(data = all_trees,
+          aes(color = type),
+          size = 0.5, 
+          alpha = 0.2) +
+  facet_wrap(~ CounDist, ncol = 2) +
+  scale_color_manual(values = c("Live Trees" = "darkgreen",
+                                "Dead Trees" = "red"),
+                     name = "Tree Condition") +
+  xlab("Longitude") +
+  ylab("Latitude") +
+  labs(title = "Tree Distribution in Districts 32 and 46") +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+It can be easily observed that district 46 has way better tree planting condition than district 32. There are a lot more green area in district 46 than that of district 32.
+Our project will give the tree planting condition in district 32 no worse than that of district 46.
+
+### Analysis on Safety Risk Proposed By Unhealthy Trees and Ongoing Maintenance Orders in District 32
+Note that the following analysis is for Extra Credit Opportunity #02: Additional Parks Data.
+```{r}
+#| code-fold: true
+
+order |>
+  filter(citycouncil == "32.0") |>
+  count(wotype) |>
+  arrange(desc(n)) |>
+  rename(Number = n,
+         `Work Order Type` = wotype) |>
+  datatable(options = list(searching = FALSE, info = FALSE)) 
+```
+As shown by the above data table, the work orders in district 32 now are mostly "Block Pruning", which does not help solve the most serious problem --- dead trees. Our project thereby proposes to have more "Tree Removal" and "Tree Plant-Street Tree" as well as more "Tree Plant-Street Tree Block". These three steps will gradually improve the environmental condition in district 32.
+
+```{r}
+#| code-fold: true
+
+objectid_32 <- order |>
+  filter(citycouncil == "32.0") |>
+  pull(objectid)
+
+risk_32 <- risk |>
+  filter(objectid %in% objectid_32) |>
+  mutate(riskrating = as.numeric(riskrating)) |>
+  filter(!is.na(riskrating)) |> 
+  count(riskrating)
+
+ggplot(risk_32, aes(x = factor(riskrating), y = n)) +
+  geom_col(fill = "gold") +
+  geom_text(aes(label = n), vjust = -0.3, size = 4) + 
+  xlab("Risk Rating") +
+  ylab("Number of Cases") +
+  ylim(0,300) +
+  labs(title = "Distribution of Risk Ratings in District 32") +
+  theme_minimal()
+```
+The above bar plot clearly shows the distribution of the risk rating in district 32. It can be easily observed that cases with risk higher than 6 are the most common cases, and are roughly 72.5% of all cases. This suggests that we should take immediate actions on removing those dead trees or trees not are not healthy before they cause serious consequences. Therefore, our project should be put into priority in district 32.
