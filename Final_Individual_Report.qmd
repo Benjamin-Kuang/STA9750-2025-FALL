@@ -1,0 +1,331 @@
+---
+title: "Final Individual Report"
+author: "Jin Kuang"
+date: "`r Sys.Date()`"
+format: 
+  html: 
+    toc: true
+    toc-depth: 3
+---
+
+## Introduction
+According to World Obesity Federation, the global average of obesity rate for adults is roughly 20%. But the average obesity rate in the U.S. for 2025 even goes up to 40.3% for adults, and 20% for children. These number keeps reminding us that obesity has become one of the most urgent issues in the health area of the United States. Obesity will not only cause the increasing risk of type 2 diabetes and other chronic conditions, but also is tightly associated with other mental issues such as depression and anxiety, eventually lead to significant consequences to its vulnerable populations.
+
+Even though it seems that anyone at any age could have obesity, obesity actually is not equally spread across all ages. Some groups of people may be more vulnerable to obesity, while other groups of people may be more resistant or resilient to obesity. Understanding **whether specific age groups in the United States are more prone to becoming obese** is helpful for government policy makers or healthcare workers to determine the potential factors that caused the obesity to be so prevalent in the United States, and therefore possibly prevent it in the near future.
+
+## Data Source
+```{r, message=FALSE}
+#| code-fold: true
+
+library(readr)
+
+url <- "https://data.cdc.gov/api/views/hn4x-zwk7/rows.csv?accessType=DOWNLOAD"
+data_dir <- "data"
+file_path <- file.path(data_dir, "cdc_data.csv")
+
+if (!dir.exists(data_dir)) {
+  dir.create(data_dir, showWarnings=FALSE, recursive = TRUE)
+}
+
+if (!file.exists(file_path)) {
+  download.file(url,
+                destfile = file_path, 
+                mode = "wb")
+}
+
+obesity_NPO <- read_csv(file_path)
+```
+To achieve the aforementioned goals, we use the data "Nutrition, Physical Activity, and Obesity - Behavioral Risk Factor Surveillance System", which was published by Centers of Disease Control and Prevention (CDC). CDC is the nation's science organization that designed to protect public health.
+
+The above code automatically downloads the necessary data set for the targeted specific question from a standard web API.
+
+## Exploratory Data Analysis
+### Examination On The Data Set 
+There are a total of 110,880 cases recorded in the data set "Nutrition, Physical Activity, and Obesity - Behavioral Risk Factor Surveillance System" and 33 different attributes (columns) in the data set. 
+
+- **YearStart / YearEnd**: The starting year and end year of one specific record.
+- **LocationAbbr**: The city/state abbreviation in the United States of one specific record.
+- **LocationDesc**: The full name of the city/state in the United States of one specific record.
+- **Datasource**: The name of the source where that specific record comes from.
+- **Class**: The category of the records. It contains three categories: "Obesity / Weight Status", "Physical Activity", and "Fruits and Vegetables".
+- **Topic**: The topic of the records. It contains three categories: "Obesity / Weight Status", "Physical Activity - Behavior", and "Fruits and Vegetables - Behavior".
+- **Question**: This column describes which kinds of value is recorded in the data set. It contains nine questions: "Percent of adults aged 18 years and older who have obesity", "Percent of adults aged 18 years and older who have an overweight classification", "Percent of adults who achieve at least 150 minutes a week of moderate-intensity aerobic physical activity or 75 minutes a week of vigorous-intensity aerobic activity (or an equivalent combination)", "Percent of adults who achieve at least 150 minutes a week of moderate-intensity aerobic physical activity or 75 minutes a week of vigorous-intensity aerobic physical activity (or an equivalent combination) and engage in muscle-strengthening activities on 2 or more days a week", "Percent of adults who achieve more than 300 minutes a week of moderate-intensity aerobic physical activity or 150 minutes a week of vigorous-intensity aerobic activity (or an equivalent combination)", "Percent of adults who engage in muscle-strengthening activities on 2 or more days a week", "Percent of adults who engage in no leisure-time physical activity", "Percent of adults who report consuming fruit less than one time daily", and "Percent of adults who report consuming vegetables less than one time daily".
+- **Data_Value_Unit**: The unit of the data value.
+- **Data_Value_Type**: The type of the data value.
+- **Data_Value**: The value recorded of that specific category.
+- **Data_Value_Alt**: The same value as "Data_Value" in this data set.
+- **Data_Value_Footnote_Symbol**: The symbol of the footnote for that specific record.
+- **Data_Value_Footnote**: The footnote for that specific record.
+- **Low_Confidence_Limit / High_Confidence_Limit**: The lower bound and upper bound of the data value in that specific record, respectively.
+- **Sample_Size**: The sample size for that specific record.
+- **Total**: This column indicates whether that specific record represents all population.
+- **Age(years)**: This column represents the different age of that group of people for that specific record. It contains "18 - 24", "25 - 34", "35 - 44", "45 - 54", "55 - 64", and "65 or older".
+- **Education**: This column represents the education level of that group of people in that specific record. It contains "College graduate", "High school graduate", "Less than high school", "Some college or technical sch", and "Some college or technical school".
+- **Sex**: This column represents the sexuality of that group of people in that specific record. It contains "Female" and "Male".
+- **Income**: This column represents the income level of that group of people in that specific record.
+- **Race/Ethnicity**: This column represents the race of that group of people in that specific record. It contains "2 or more races", "American Indian/Alaska Native", "Asian", "Hawaiian/Pacific Islander", "Hispanic", "Non-Hispanic Black", "Non-Hispanic White", and Other".
+- **GeoLocation**: This column represents the longitude and latitude of the location being recorded in that specific record.
+- **ClassID / TopicID / QuestionID / DataValueTypeID / LocationID**: These columns represent the ID number of the "Class", "Topic", "Question", "DataValueType", and "Location" for that specific record, respectively.
+- **StratificationCategory1**: This column indicates which attributes (columns) are we interested in (non-null values) for that specific record.
+- **Stratification1**: This column represents the detailed category of that attributes (column) which we are interested in (non-null values) for that specific record.
+- **StratificationCategoryId1 / StratificationID1**: These columns represent the ID number of the "StratificationCategory1" and "Stratification1" for that specific record, respectively.
+
+### Data Processing
+To discover the association between obesity and age, we first filter attributes that relates to the obesity for the column "Question" and "Topic".
+```{r}
+#| code-fold: true
+
+suppressPackageStartupMessages(library(DT))
+
+obesity <- subset(obesity_NPO,
+                  grepl("Obese", Question, ignore.case = TRUE) |
+                  grepl("Obesity", Topic, ignore.case = TRUE))
+
+head(obesity, 10) |>
+  datatable(options = list(searching = FALSE, info = FALSE)) 
+```
+
+Now the data set contains only 43,120 entries and 33 columns, in which every case is related to obesity. But notice that there are a lot of N/A values under the column "Age(years)", so the next step is to filter out any null values under the column "Age(years)". Since we are considering the relationship between obesity and age, then we can select only columns "YearStart", "LocationAbbr", "Age(years)", and "Data_Value" for the later analysis for now.
+
+```{r}
+#| code-fold: true
+
+suppressPackageStartupMessages(library(dplyr))
+
+obesity_age <- obesity[!is.na(obesity$"Age(years)"), c("YearStart", "LocationAbbr", "Age(years)", "Data_Value")]
+
+head(obesity_age, 10) |>
+  datatable(options = list(searching = FALSE, info = FALSE)) 
+```
+
+Since we are interested in the obesity rate in the entire United States, not in individual states, we can calculate the obesity in the United States by taking the average of all city/states obesity records.
+
+We can first aggregate data from all years (2011 to 2024) and observe whether specific age groups in the United States are more prone to becoming obese over the entire time of records.
+
+```{r}
+#| code-fold: true
+
+age_summary <- obesity_age |>
+  group_by(`Age(years)`) |>
+  summarize(`Average Percentage in Obesity` = mean(Data_Value, na.rm = TRUE),
+            n = n()) |>
+  rename(`Age Group` = `Age(years)`,
+         `Sample Size` = n) 
+
+age_summary |>
+  datatable(options = list(searching = FALSE, info = FALSE)) 
+```
+
+### Permutation Testing: Whether Obesity Rate Actually Differs Between Different Age Groups In The United States
+To test whether obesity rate actually differs between different age groups in the United States, a computer-based inference, specifically permutation testing, could be applied to find the answer. If the answer is "yes", then the answer to our specific question **whether specific age groups in the United States are more prone to becoming obese** is also "yes".
+
+By setting different age groups as categorical explanatory variable and obesity percentage as the continuous response variable, our null hypothesis in this case is obesity rate and age groups are independent of each other, suggesting that random variation is the actual cause of the differences in average obesity percentage across different age groups. The alternative hypothesis is therefore that at least one of the age groups' obesity rate differs from that of the others.
+
+The test statistics here is calculated by how average obesity rate for each group deviates from the average obesity rate for the overall population. This suggests that the greater the test statistics, the stronger evidence against the null hypothesis. Based on the aforementioned assumptions, 5000 random permutations are performed to generate the results.
+
+The follow code performs permutation testing as stated above, and calculates the p-value:
+
+```{r}
+#| code-fold: true
+
+set.seed(2025)
+
+obesity_age_2 <- obesity_age |>
+  filter(!is.na(Data_Value))
+
+obesity_mean <- obesity_age_2|>
+  group_by(`Age(years)`)|>
+  summarize(average_obesity = mean(Data_Value), 
+            n = n(), 
+            .groups = "drop")
+
+test_statistics <- sum(obesity_mean$n * (obesity_mean$average_obesity - mean(obesity_age_2$Data_Value, na.rm = TRUE))^2)
+
+result <- numeric(5000)
+
+for (i in 1 : 5000) {
+  sample_age <- sample(obesity_age_2$`Age(years)`)
+  temp <- obesity_age_2
+  temp$sample_age <- sample_age
+
+  sample_mean <- temp|>
+    group_by(sample_age)|>
+    summarize(average_obesity = mean(Data_Value),
+              n = n(), 
+              .groups = "drop")
+
+  result[i] <- sum(sample_mean$n * (sample_mean$average_obesity - mean(obesity_age_2$Data_Value, na.rm = TRUE))^2)
+}
+
+p_value <- mean(result >= test_statistics)
+
+print(paste("p-value of the 5000 Permutation Testing:", p_value))
+```
+
+By conducting a permutation testing, p-value is concluded to be smaller than 0.05. Therefore, there is strong evidence against the null hypothesis. A statistical inference could be made: obesity rate actually differs between different age groups in the United States, and that specific age groups in the United States indeed are more prone to becoming obese.
+
+### ANOVA Testing
+Apart from the computer-based inference such as permutation testing, an one-sided anova test could be further performed to help determine if average obesity rates are different across different age groups. 
+
+By setting different age groups "Age(years)" as categorical explanatory variable and obesity percentage "Data_Value" as the continuous response variable, the null hypothesis of the anova test in this case is that average obesity rates are equal across all age groups, which is $\mu_0 = \mu_1 = \mu_2 = \mu_3 = \mu_4 = \mu_5$, where $\mu_0$ is the average obesity rate for age group 18 - 24, $\mu_1$ is the average obesity rate for age group 25 - 34, $\mu_2$ is the average obesity rate for age group 35 - 44, $\mu_3$ is the average obesity rate for age group 45 - 54, $\mu_4$ is the average obesity rate for age group 55 - 64, $\mu_5$ is the average obesity rate for age group 65 or older. The alternative hypothesis is therefore that at least one of the age groups has different obesity rate from that of the others. That is at least one of $\mu_0, \mu_1, \mu_2, \mu_3, \mu_4, \mu_5$ is not the same as the others.
+
+The follow code performs anova testing as stated above:
+
+```{r, Warnings = FALSE}
+#| code-fold: true
+
+anova_model <- aov(Data_Value ~ `Age(years)`, 
+                   data = na.omit(obesity_age[, c("Data_Value", "Age(years)")]))
+summary(anova_model)
+```
+
+By conducting an anova testing, p-value is roughly equal to zero, which is smaller than 0.05. Therefore, there is strong evidence against the null hypothesis, suggesting that obesity rates are not equal across all age groups in the United States, and that specific age groups in the United States indeed are more prone to becoming obese. 
+
+This conclusion is in accordance with the permutation testing result in the previous session, which both suggests that obesity rates are not equal across all age groups in the United States.
+
+### Interactive Bar Chart By Age Groups
+In addition to the above two testings (permutation testing and anova testing) which helps determine obesity rates are not equal across all age groups in the United States, we can use a bar chart to visualize the size of the obesity percentage in each age group to further find which group has the most average percentage across all years in the United States. By doing so, the answer to the specific question **whether specific age groups in the United States are more prone to becoming obese** is clearer.
+
+```{r, warnings = FALSE}
+#| code-fold: true
+
+library(ggplot2)
+suppressWarnings(suppressPackageStartupMessages(library(plotly)))
+
+highest_age_group <- age_summary |>
+  slice_max(`Average Percentage in Obesity`) |>
+  pull(`Age Group`)
+
+plot_ly() |>
+  add_bars(data = subset(age_summary, `Age Group` != highest_age_group),
+           x = ~`Age Group`,
+           y = ~`Average Percentage in Obesity`,
+           text = ~paste0(round(`Average Percentage in Obesity`, 2), "%"),
+           hoverinfo = "text",
+           marker = list(color = "orange"),
+           name = "Obesity %") |>
+  add_bars(data = subset(age_summary, `Age Group` == highest_age_group),
+           x = ~`Age Group`,
+           y = ~`Average Percentage in Obesity`,
+           text = ~paste0(round(`Average Percentage in Obesity`, 2), "%"),
+           hoverinfo = "text",
+           marker = list(color = "red"),
+           name = "Obesity %") |>
+  add_lines(data = age_summary,
+            x = ~`Age Group`,
+            y = ~`Average Percentage in Obesity`,
+            line = list(color = "blue", width = 3),
+            name = "Trend") |>
+  layout(title = "Average Obesity Rate By Age Group (Interactive Plot)",
+         xaxis = list(title = "Age Group",
+                      categoryorder = "array",
+                      categoryarray = c("18 - 24", 
+                                        "25 - 34", 
+                                        "35 - 44", 
+                                        "45 - 54", 
+                                        "55 - 64", 
+                                        "65 or older")),
+         yaxis = list(title = "Average Obesity Rate in the Population"))
+```
+
+From the above interactive bar chart, we can conclude that the average obesity rate for people at 18 - 24 years old is 22.2%; the average obesity rate for people at 25 -34 years old is 31.41%; the average obesity rate for people at 35 - 44 years old is 35.05%; the average obesity rate for people at 45- 54 years old is 36.64%; the average obesity rate for people at 55 - 64 years old is 36.48%; and the average obesity rate for people at 65 years old or older is 33.56%.
+
+It is apparent to see that there is an increasing trend in the average obesity percentage in the population for people under 54 years old. This suggests that age and obesity seem to be positively correlated for people under 54 years old. In other words, before 54 years old, the older you are, the higher chance of getting obese. This number starts to drop slightly when people are 55 years old, and greatly when they are 65 years old or older.
+
+Overall, we can conclude that younger people (who are 18 - 24 years old) are the least vulnerable group of population to the obesity, while people who are at 45 - 54 years old are the most vulnerable group of population to the obesity. This conclusion is actually in accordance with what permutation testing and anova testing concluded in the previous sessions, that obesity rates are not equal across all age groups in the United States. Moreover, there is a trend that more people tend to have obesity when they are getting older, and that proportion of people eventually peaks when they are 45 - 54 years old.
+
+### Interactive Line Chart By Years
+Comparing the obesity rate across different age groups without the scale of year may not be as accurate as it is expected to be, since different years may produce different results. Consequently, it is imperative now to compare the obesity rate across different age groups for each year in this data set.
+
+```{r}
+#| code-fold: true
+
+obesity_trend <- obesity_age |>
+  group_by(YearStart, `Age(years)`) |>
+  summarize(`Average Obesity` = mean(Data_Value, na.rm = TRUE),
+            .groups = "drop")
+
+plot_by_year <- ggplot(obesity_trend,
+            aes(x = YearStart, y = `Average Obesity`,
+                color = `Age(years)`,
+                group = `Age(years)`,
+                text = paste0("Age Group: ", `Age(years)`,
+                              "<br>Average Obesity Rate: ", round(`Average Obesity`, 2), "%",
+                              "<br>Year: ", YearStart))) +
+  geom_line(linewidth = 1) +
+  geom_point(size = 2) +
+  labs(title = "Average Obesity Rate By Age Group Over 2011 – 2024 (Interactive Plot)",
+       color = "Age Group") +
+  xlab("Year") +
+  ylab("Average Obesity Rate (%)") +
+  theme_minimal() +
+  theme(plot.title = element_text(face = "bold"),
+        axis.title = element_text(face = "bold"))
+
+ggplotly(plot_by_year, tooltip = "text")
+```
+
+The above line chart perfectly captures the trend of obesity rate (y-axis) across different age groups (represented by different colors) for each year between 2011 to 2024 (x-axis). From this line chart, it is obvious that age group "18 - 24" lies below all other groups for every year between 2011 to 2024, suggesting that population whose age is between 18 to 24 is the least vulnerable population to the obesity no matter what year it was. This conclusion is actually in accordance with what was just concluded in the previous sessions. On the other hand, age group "45 - 54" lies above all other groups for every year between 2015 to 2024. Before 2015, age group 55 - 64 overwhelmed all other age groups and had the most percentage of obesity people. This finding suggests that population whose age is between 45 to 54 has become the most vulnerable population to the obesity since 2015. This conclusion suggests that age group 45 - 64 (combing 45 - 54 and 55 - 64) seems to face the highest risk of getting obesity.
+
+Besides, an overall increasing trend for each age group from 2011 to 2024 could also be observed, which suggests that obesity for every age group has become worse and more prevalent every year than before.
+
+### Interactive Predictive Line Chart By Years
+In addition to the interactive line chart by years, which could only help determine the past conditions, a predictive line chart could help determine how obesity rates across different age groups will shift in the future and whether the most vulnerable population to the obesity will change or not. To do so, a predictive model based on the historical data needs to be developed. (Note that the model used here is simple linear regression model)
+
+```{r}
+#| code-fold: true
+
+prediction <- obesity_trend |>
+  group_by(`Age(years)`) |>
+  do({model <- lm(`Average Obesity` ~ YearStart, data = .)
+  preds <- predict(model, newdata = data.frame(YearStart = 2025:2028))
+  data.frame(YearStart = 2025:2028,
+             `Average Obesity` = preds,
+             `Age(years)` = unique(.$`Age(years)`))}) |>
+  rename(`Average Obesity` = Average.Obesity) |>
+  ungroup()
+
+past_and_future <- bind_rows(obesity_trend |> mutate(Type = "Observed"),
+                             prediction |> mutate(Type = "Predicted"))
+
+prediction_plot <- ggplot(past_and_future,
+                          aes(x = YearStart, y = `Average Obesity`,
+                              color = `Age(years)`,
+                              group = `Age(years)`,
+                              linetype = Type,
+                              text = paste0("Age Group: ", `Age(years)`,
+                                            "<br>Average Obesity Rate: ", round(`Average Obesity`, 2), "%",
+                                            "<br>Year: ", YearStart))) +
+  geom_line(linewidth = 1) +
+  geom_point(size = 2) +
+  scale_linetype_manual(values = c("Observed" = "solid",
+                                   "Predicted" = "dashed")) +
+  labs(title = "Average Obesity Rate By Age Group Over 2011 – 2028 (Interactive Plot)",
+       color = "Age Group",
+       linetype = NULL) +
+  xlab("Year") +
+  ylab("Average Obesity Rate (%)") +
+  theme_minimal() +
+  theme(plot.title = element_text(face = "bold"),
+        axis.title = element_text(face = "bold"))
+
+ggplotly(prediction_plot, tooltip = "text")
+```
+
+The above predictive line chart predicts the possible values of average obesity rate across different age groups for the next 4 years (2025 to 2028). From the plot, conclusion could be drawn that age group 45 - 54 will still be the most vulnerable population to the obesity, and the average obesity percentage for this group will reach 39.54% by 2028; age group 18-24 will still be the least vulnerable population to the obesity, and the average obesity percentage for this group will reach 25.18% by 2028. Also, an overall increasing trend for each age group from 2025 to 2028 could also be observed, which suggests that obesity for every age group will continue to become worse and more prevalent every year than before in the future.
+
+## Discussion
+From the above two testings (permutation testing and anova testing) as well as three visualizations (interactive bar chart by age groups, interactive line chart by years, interactive predictive line chart by years), all results lead to one same conclusion: obesity rates are not equally spread across all age groups in the United States; certain age group is indeed more prone to becoming obese than the others. Specifically, age group that between 45 to 54 is the most vulnerable group of population to the obesity, with an average obesity rates being 36.63% across 2011 to 2024 in the United States. Age group that between 18 to 24 is the least vulnerable group of population to the obesity, with the average obesity rates being only 22.2% across 2011 to 2024 in the United States.
+
+Scanning through the obesity rates by each year from 2011 to 2024, it is apparent that an overall increasing trend of obesity prevalence for each age group could be found. Moreover, from 2011 to 2024, age group 55 - 64 was the most vulnerable population to obesity; however, age group 45 - 54 has taken the lead since 2015 and become the most vulnerable population to obesity.
+
+Through the interactive predictive line chart by years, it is expected that from 2025 to 2028, an overall increasing trend of obesity prevalence for each age group still exists. Moreover, age group 45 - 54 is expected to remain the most vulnerable population to the obesity, and the average obesity percentage for this group is expected to reach 39.54% by 2028; age group 18-24 is expected to remain the least vulnerable population to the obesity, and the average obesity percentage for this group is expected to reach 25.18% by 2028.
+
+## Limitations
+This report focuses on the aggregated obesity rates from the entire United States. The analysis uses mostly population average and ignore potential correlation between obesity and states. Different states may yield different results regarding the relationships between the age groups and obesity. Future studies could focus more on controlling the state and the year as fixed variables and then perform the same analysis to determine the association between the age groups and obesity.
+
+Also, the predictive model used above is simple linear regression model, which has ignored many other factors and their interactions. Future studies could further develop a more precise by adding more factors and using a more complicated model to yield more accurate results. 
+
+## Reference
+U.S. Department of Health & Human Services. Centers for Disease Control and Prevention. 
+https://catalog.data.gov/dataset/nutrition-physical-activity-and-obesity-behavioral-risk-factor-surveillance-system
