@@ -353,7 +353,6 @@ ordered = TRUE)
 state_thresholds %>% arrange(first_high_age, state) %>% head(20)
 ```
 
-
 ```{r}
 #| code-fold: true
 #| warning: false
