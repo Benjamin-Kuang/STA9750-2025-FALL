@@ -19,7 +19,7 @@ Viewing obesity through both age and location has clear policy value. If some st
 This project also highlights the need to be careful with survey-based data. We use clear visuals and simple comparisons to find patterns that are consistent across states and age groups, while staying cautious about over-interpreting noisy results. Overall, our goal is to pull out insights that are easy to explain and useful for decision-making, without pretending the data can answer every “why” question on its own.
 
 ## Data Source
-```{r, warnings = FALSE}
+```{r, warnings = FALSE, message=FALSE}
 #| code-fold: true
 
 library(readr)
