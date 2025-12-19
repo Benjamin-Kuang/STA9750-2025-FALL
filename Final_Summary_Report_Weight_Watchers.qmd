@@ -186,6 +186,7 @@ Besides, an overall increasing trend for each age group from 2011 to 2024 could 
 
 ![Visual check in a few representative states](Visual check.png)
 My contribution to the broader project focuses on a simple but underexplored question: does obesity increase with age at the same rate everywhere, or are there states where obesity rises much more sharply as people get older? Two states might have similar overall obesity levels, yet very different age profiles, one where obesity increases gradually with age, and another where prevalence rises rapidly from young adulthood into middle age. Understanding these differences matters for prevention and policy, because it speaks to when in the life course obesity risk accelerates, not just where obesity is most prevalent.
+
 This question fits into the overall project goal of understanding how obesity varies across states and age groups. Rather than looking at each age group separately, I focus on the relationship between age and obesity within each state, which helps identify places where aging is associated with particularly steep increases in obesity prevalence.
 
 ### [Chris’ Individual Report - Is obesity regionally concentrated based across U.S. States?](https://cchan101.github.io/STA9750-2025-FALL/STA_9750_Individual_Report.html)
@@ -274,9 +275,181 @@ ggplot(map_obesity, aes(x = long, y = lat, group = group, fill = Obesity)) +
 
 
 ### [Tenchi’s Individual Report - At what age does obesity become “common” in each state, and which states reach high obesity levels earlier or later than the national pattern?](https://chentenchi.github.io/STA9750-2025-FALL/Tenchi_Chen_Individual_Report.html) 
+
+```{r, echo=FALSE}
+#| code-fold: true
+#| warning: false
+#| message: false
+#| results: hide
+
+library(tidyverse)
+
+cdc_url <- "https://data.cdc.gov/api/views/hn4x-zwk7/rows.csv?accessType=DOWNLOAD"
+
+raw_brfss <- read.csv(cdc_url, stringsAsFactors = FALSE)
+
+glimpse(raw_brfss)
+
+# Choose one recent year for the threshold analysis
+target_year <- 2023   # change if your team uses a different year
+
+# Filter to state x age-group obesity prevalence
+obesity_age_state <- raw_brfss %>%
+  filter(
+    Class == "Obesity / Weight Status",
+    grepl("obesity", Question, ignore.case = TRUE),
+    Age.years. != "",
+    LocationAbbr %in% state.abb,
+    !is.na(Data_Value),
+    Data_Value_Type == "Value"   # ensures we're using the numeric estimate
+  ) %>%
+  transmute(
+    year        = YearStart,
+    state       = LocationDesc,
+    state_abbr  = LocationAbbr,
+    age_group   = Age.years.,
+    obesity_pct = Data_Value
+  )
+
+# Keep only the selected year
+obesity_age_state_yr <- obesity_age_state %>%
+  filter(year == target_year)
+
+# Order age groups (use whatever ordering appears in the dataset)
+age_levels <- obesity_age_state_yr %>%
+  distinct(age_group) %>%
+  arrange(age_group) %>%
+  pull(age_group)
+
+obesity_age_state_yr <- obesity_age_state_yr %>%
+  mutate(age_group = factor(age_group, levels = age_levels, ordered = TRUE))
+
+# Confirm we have 50 states x age groups (approx)
+obesity_age_state_yr %>%
+  summarise(
+    n_rows = n(),
+    n_states = n_distinct(state_abbr),
+    n_age_groups = n_distinct(age_group)
+  )
+
+threshold <- 35 # percent; change if you want 30, 40, etc.
+
+state_thresholds <- obesity_age_state_yr %>%
+group_by(state, state_abbr) %>%
+arrange(age_group) %>%
+summarise(
+first_high_age = {
+idx <- which(obesity_pct >= threshold)
+if (length(idx) == 0) NA_character_ else as.character(age_group[min(idx)])
+},
+.groups = "drop"
+) %>%
+mutate(
+first_high_age = factor(first_high_age,
+levels = age_levels,
+ordered = TRUE)
+)
+
+state_thresholds %>% arrange(first_high_age, state) %>% head(20)
+```
+
+
+```{r}
+#| code-fold: true
+#| warning: false
+#| message: false
+# Chunk: per-state bar plot with red→green color scale
+
+# keep only states that ever reach the threshold
+plot_data <- state_thresholds %>%
+  filter(!is.na(first_high_age))
+
+# define colors from "bad" (early) to "better" (later)
+age_palette <- c(
+  "25 - 34" = "#d73027",  # red
+  "35 - 44" = "#fc8d59",  # orange
+  "45 - 54" = "#fee08b",  # yellow
+  "55 - 64" = "#91cf60"   # green
+  # add "65+" here if it ever appears:
+  # "65+" = "#1a9850"
+)
+
+ggplot(
+  plot_data,
+  aes(
+    x = as.numeric(first_high_age),
+    y = reorder(state, as.numeric(first_high_age)),
+    fill = first_high_age
+  )
+) +
+  geom_col() +
+  scale_x_continuous(
+    breaks = seq_along(age_levels),
+    labels = age_levels
+  ) +
+  scale_fill_manual(
+    values = age_palette,
+    name   = "Earliest age group\nwith ≥ 35% obesity"
+  ) +
+  labs(
+    title = paste0("Earliest age group where obesity ≥ ", threshold,
+                   "% by state (", target_year, ")"),
+    x = "Age group (earlier = younger, more red = worse)",
+    y = "State"
+  ) +
+  theme_minimal()
+
+state_counts <- state_thresholds %>%
+  filter(!is.na(first_high_age)) %>%
+  count(first_high_age)
+
+total_states <- sum(state_counts$n)
+
+state_counts <- state_counts %>%
+  mutate(
+    perc  = 100 * n / total_states,
+    # compact label: count + percent only; age group stays in legend
+    label = paste0(n, " (", round(perc), "%)")
+  )
+
+age_palette <- c(
+  "25 - 34" = "#d73027",  # red
+  "35 - 44" = "#fc8d59",  # orange
+  "45 - 54" = "#fee08b",  # yellow
+  "55 - 64" = "#91cf60"   # green
+)
+
+ggplot(state_counts,
+       aes(x = "", y = perc, fill = first_high_age)) +
+  geom_col(width = 1, color = "white") +
+  coord_polar(theta = "y") +
+  scale_fill_manual(
+    values = age_palette,
+    name   = "Earliest age group\nwith ≥ 35% obesity"
+  ) +
+  geom_text(
+    aes(label = label),
+    position = position_stack(vjust = 0.5),
+    size = 2.7   # slightly smaller so the green slice fits better
+  ) +
+  labs(
+    title = paste0("Distribution of states by age group\n",
+                   "when obesity first exceeds ", threshold,
+                   "% (", target_year, ")"),
+    x = NULL,
+    y = NULL
+  ) +
+  theme_void() +
+  theme(legend.position = "right")
+
+```
+
 My contribution to the broader project asks a simple question. At what age does obesity become common in each state, and which states reach high obesity levels earlier or later than others? This matters because two states can have similar overall obesity rates but very different age patterns. If obesity becomes common by early adulthood in a state, prevention needs to start earlier. If it becomes common later, the timing and targeting of interventions may look different.
+
 To answer this, I used CDC BRFSS obesity prevalence data grouped by state and age group. I chose a clear cutoff for “high obesity,” which is 35 percent. For each state, I checked the age groups from youngest to oldest and recorded the first age group where obesity prevalence reached 35 percent or higher. I summarized the results with a state-by-state plot using a red to green color scale, and a distribution chart showing how many states first reached the threshold in each age group.
+
 Overall, the results suggest that in many states obesity reaches high levels by early to mid-adulthood, often by ages 25 to 34 or 35 to 44. Fewer states first cross the threshold at later ages, and some states never reach 35 percent in any age group. This supports the project’s main goal by adding a clear timing view to the geographic patterns. Important limitations are that BRFSS relies on self-reported height and weight and the age groups are broad, so the findings describe state-level patterns rather than proving causes.
+
 ### [Siya’s Individual Report - What caused obesity rates in Florida and West Virginia to act “weird”?](https://siya306.github.io/STA9750-2025-FALL/finalindividualreport.html)
 
 ![Figure: Obesity Trend Comparison – Florida vs West Virginia](https://raw.githubusercontent.com/siya306/STA9750-2025-FALL/main/image.png){fig-align="center" width="70%"}
@@ -286,8 +459,8 @@ My individual analysis focused on understanding why Florida and West Virginia ap
 
 ### [Enkel’s Individual Report - Is obesity rate positively correlated with age within each state of U.S.?](https://enkelmezini.github.io/STA9750-2025-FALL/FinalProjectIndividual.html)
 
-
 To move beyond national aggregates, this specific analysis investigates the "velocity" of obesity as populations age within distinct state boundaries, aiming to uncover whether the relationship between age and weight gain is universal or geographically contingent. While national trends often suggest a broad increase in prevalence over time, these summaries frequently mask significant regional nuances in how quickly health risks accelerate during the life course. By utilizing a dual-methodological approach—combining spatiotemporal heatmaps with non-parametric correlation analysis—this study visualizes the progression of obesity across six age cohorts to determine where the relationship between age and metabolic health is most pronounced.
+
 The primary visual entry point for this investigation is a heatmap comparing obesity prevalence across all 50 states. This visualization allows for a simultaneous "bird's-eye view" of both the geographic intensity of the epidemic and the internal age-related trajectory within each state's population. By categorizing the data into ordered factors ranging from young adulthood (18–24) to seniority (65 or older), the heatmap provides a clear view of when obesity becomes a dominant health concern in different parts of the country.
 
 ```{r,message=FALSE,warning=FALSE,results='hide'}
@@ -387,34 +560,47 @@ print(slide2_plot)
 ```
 
 The correlation results validate the visual evidence, confirming a near-universal positive link between age and obesity across the United States. Out of all jurisdictions examined, every state except for Hawaii exhibits a positive correlation coefficient, indicating that as residents age, their risk of obesity significantly increases. The high-intensity correlations found in states like Massachusetts and Minnesota contrast sharply with the flatter profile of Hawaii, suggesting that Hawaii may benefit from unique cultural or environmental protective factors that mitigate age-related weight gain. Ultimately, this analysis reinforces the idea that while aging is a primary driver of obesity prevalence, the "steepness" of this risk curve is heavily influenced by the state in which one resides.
-## Key Findings:
+
+#### Key Findings
 My contribution to the team project establishes a geographic baseline for adult obesity in the United States by testing whether state-level obesity prevalence is regionally clustered rather than evenly distributed. This synopsis is written in the non-technical, “words and pictures” style expected for the final group report, emphasizing motivation, key results, limitations, and next steps rather than code.​
 Using the Lake County, Illinois Open Data Portal’s ArcGIS-hosted “National Obesity By State” dataset (a BRFSS-based snapshot), I built a reproducible data pull via ArcGIS web endpoints so the analysis can be rerun without manually downloading files. I then created clear visual summaries—especially a state-level choropleth map—to make geographic patterns interpretable for a broad audience and to evaluate whether an “obesity belt” appears in the data.
+
 Within the broader project narrative, these findings contribute the “where” component by identifying regions with consistently elevated obesity, helping contextualize other team analyses focused on time trends, age patterns, or atypical states. Key limitations are that these are aggregated state-level estimates and rely on self-reported survey measures, which can mask within-state heterogeneity and may understate true prevalence. A practical next step is to replicate this work at finer geographic resolution (e.g., counties/metros) and incorporate additional covariates (such as activity, diet, income, and education) to better explain the regional clustering.
+
 My contribution to the broader project asks a simple question. At what age does obesity become common in each state, and which states reach high obesity levels earlier or later than others? This matters because two states can have similar overall obesity rates but very different age patterns. If obesity becomes common by early adulthood in a state, prevention needs to start earlier. If it becomes common later, the timing and targeting of interventions may look different.
+
 To answer this, I used CDC BRFSS obesity prevalence data grouped by state and age group. I chose a clear cutoff for “high obesity,” which is 35 percent. For each state, I checked the age groups from youngest to oldest and recorded the first age group where obesity prevalence reached 35 percent or higher. I summarized the results with a state-by-state plot using a red to green color scale, and a distribution chart showing how many states first reached the threshold in each age group.
+
 Overall, the results suggest that in many states obesity reaches high levels by early to mid-adulthood, often by ages 25 to 34 or 35 to 44. Fewer states first cross the threshold at later ages, and some states never reach 35 percent in any age group. This supports the project’s main goal by adding a clear timing view to the geographic patterns. Important limitations are that BRFSS relies on self-reported height and weight and the age groups are broad, so the findings describe state-level patterns rather than proving causes.
 The central finding is that states differ meaningfully in how sharply obesity prevalence increases with age. In some states, obesity prevalence rises steadily but moderately across adult age groups. In others, the increase from younger to older adults is much steeper.
-When these age gradients are mapped across the United States, a clear geographic pattern emerges. Some regions show consistently steeper age-related increases in obesity, while others display relatively flat profiles. These differences are not obvious when looking only at overall obesity rates, which highlights the value of focusing on age patterns rather than single summary measures. States differ meaningfully in how sharply obesity increases with age. Some states show a stronger age and obesity relationship, suggesting that the risk of obesity rises more rapidly as people age in those states compared to others.
 
+When these age gradients are mapped across the United States, a clear geographic pattern emerges. Some regions show consistently steeper age-related increases in obesity, while others display relatively flat profiles. These differences are not obvious when looking only at overall obesity rates, which highlights the value of focusing on age patterns rather than single summary measures. States differ meaningfully in how sharply obesity increases with age. Some states show a stronger age and obesity relationship, suggesting that the risk of obesity rises more rapidly as people age in those states compared to others.
 
 For example, California and Illinois exhibited among the steepest increases in obesity prevalence with age, indicating a notable jump in obesity rates as adults progress through age groups. Conversely, Arizona and Mississippi showed relatively flat slopes, suggesting weaker age effects. These differences were confirmed with visualization: plotting obesity prevalence against age midpoints in selected states clearly shows that in some states, obesity rises quickly between young adulthood and middle age, while in others the pattern is flatter.
 
 The choropleth map of slope estimates across the contiguous U.S. provides a striking visual for audiences as it highlights geographic patterns that aren’t obvious from national summaries alone, such as clusters of faster age related increases in certain regions versus flatter patterns elsewhere. To make these differences concrete, we also examined a small number of representative states with especially steep and especially flat age gradients. Visualizing obesity prevalence by age group in these states confirms that the numerical summaries reflect real, interpretable differences in how obesity prevalence evolves across adulthood.
+
 In addition, a threshold-based summary shows that states differ not only in how sharply obesity increases with age, but also in how early obesity reaches high levels. In some states, obesity exceeds 35 percent by early adulthood, while in others it does not reach that level until later age groups or never reaches it at all. These differences are not obvious when looking only at overall obesity rates, which highlights the value of focusing on age patterns rather than a single summary measure. When the earliest age group exceeding 35 percent is compared across states, a clear national pattern emerges. Many states first exceed the threshold in the 25 to 34 or 35 to 44 age groups, while relatively few states first exceed it at older ages. This provides a simple way to distinguish earlier-onset states from later-onset states.
+
 Analysis of state-level obesity trends revealed that Florida and West Virginia deviated from the generally smooth, gradual patterns observed in most states. Florida exhibited noticeable year-to-year fluctuations in obesity prevalence, creating a “zig-zag” pattern across time. Further inspection showed that these fluctuations were not persistent or directional, suggesting instability rather than sustained population change. In contrast, West Virginia consistently displayed the highest obesity prevalence among states, with a steady upward trajectory over time. Unlike Florida, West Virginia’s pattern remained stable across years, indicating a structurally elevated obesity burden rather than survey-driven noise.
 
 ## Conclusion
 This project demonstrates that obesity trends in the United States are shaped by both age and geography, with most states exhibiting gradual, predictable increases across adulthood. Clear regional patterns emerge, particularly in Southern and Appalachian states, reinforcing existing public health research. However, the analysis also shows that not all apparent anomalies reflect true population-level differences.
+
 By integrating group-level exploration with targeted individual analyses, the project distinguishes meaningful structural patterns from survey-driven instability. States such as West Virginia represent genuine public health concerns, while others, like Florida, illustrate how survey variability can create misleading visual impressions. Together, these findings highlight the importance of combining exploratory visualization with careful diagnostic reasoning when interpreting large public health datasets.
+
 Ultimately, this work emphasizes that effective obesity prevention requires both population-level awareness and localized interpretation, ensuring that interventions are informed by real patterns rather than artifacts of measurement.
 
 ## Limitation
 This analysis relies on data from the Behavioral Risk Factor Surveillance System (BRFSS), which is based on self-reported height and weight. Self-reported measures are known to introduce reporting bias, as individuals may underreport weight or overreport height, leading to underestimation of true obesity prevalence. As a result, the absolute obesity rates presented in this analysis should be interpreted as approximate rather than exact population values.
+
 In addition, the BRFSS is a repeated cross-sectional survey rather than a longitudinal study. This means that changes observed from year to year do not track the same individuals over time and may instead reflect differences in survey sampling, weighting, or response patterns. Consequently, short-term fluctuations—particularly those observed in states such as Florida—may be driven by survey variability rather than genuine changes in population health.
+
 The analysis also focuses on aggregated age groups and state-level summaries. While this approach is appropriate for identifying broad national and regional trends, it limits our ability to examine within-group variation or local heterogeneity. Important differences within states, such as urban–rural disparities or county-level risk clusters, may therefore be masked by state-level averages.
+
 Finally, the scope of this project was intentionally descriptive and did not incorporate behavioral, socioeconomic, or environmental covariates such as income, education, physical activity, or access to healthy food. These factors are known to influence obesity risk and could help explain observed differences across states and age groups. Future analyses incorporating these variables would provide a more complete understanding of the mechanisms driving obesity trends in the United States.
 
 ## Potential Next Steps
 Taken together, our findings suggest that obesity in the United States is both age-driven and place-dependent. Many states reach high obesity levels surprisingly early in adulthood, while others experience sharper age-related increases later in life. These differences point to the need for state-specific prevention strategies, rather than one-size-fits-all national approaches.
+
 Future work could extend this analysis in several directions. Incorporating behavioral and socioeconomic variables such as physical activity, income, and education would help explain why some states experience earlier or steeper obesity growth. Moving to finer geographic units, such as counties or metropolitan areas, could uncover high-risk communities hidden within state averages. Additionally, translating these findings into interactive dashboards would allow policymakers and public health practitioners to monitor emerging patterns in near real time. Finally, an extension idea to this research would be to categorize micro and macro factors to test on what scale is obesity more affected. Large vs small can lead to insights on more in depth questions that can lead to more in depth analysis. 
